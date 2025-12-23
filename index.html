@@ -325,37 +325,38 @@
       return p;
     }
 
+    // 這裡不需要 toFileUrl 了，直接用字串即可
     const cfg = {
       brand: {
-        brand1: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Brand shop\brand shop_1.png`),
-        brand2: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Brand shop\brand shop_2.png`),
+        brand1: "brand shop_1.png",
+        brand2: "brand shop_2.png",
       },
-      wh: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\WH\wh.png`),
+      wh: "wh.png",
       watts: {
-        "20w": toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Watts\20watts.png`)
+        "20w": "20watts.png"
       },
       warranty: {
-        w13m: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Warranty\13mWarranty.png`),
-        w2y:  toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Warranty\2yWarranty.png`),
-        w10y: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Warranty\10yWarranty.png`),
-        w5y:  toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Warranty\5yWarranty.png`),
+        w13m: "13mWarranty.png",
+        w2y:  "2yWarranty.png",
+        w10y: "10yWarranty.png",
+        w5y:  "5yWarranty.png",
       },
       icon: {
-        "3dnand": toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\ICON\3D NAND.png`),
-        "4khdmi": toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\ICON\4K HDMI.png`),
-        "4kuhd":  toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\ICON\4K UHD.png`),
+        "3dnand": "3D NAND.png",
+        "4khdmi": "4K HDMI.png",
+        "4kuhd":  "4K UHD.png",
       },
       cap: {
-        "32":  toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Capacity\1x\32GB.png`),
-        "64":  toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Capacity\1x\64GB.png`),
-        "128": toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Capacity\1x\128GB.png`),
-        "256": toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Capacity\1x\256GB.png`),
+        "32":  "32GB.png",
+        "64":  "64GB.png",
+        "128": "128GB.png",
+        "256": "256GB.png",
       },
 
-      // ✅ 產品分類-子分類圖片（你提供的先放；DRAM 待補留空）
+      // 產品分類-子分類圖片
       product: {
         POWERBANK: {
-          QS58: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Product\QS58.png`)
+          QS58: "QS58.png"
         },
         DRAM: {
           "xpower ddr5 rgb": "", // 待補
@@ -720,3 +721,4 @@
   </script>
 </body>
 </html>
+
