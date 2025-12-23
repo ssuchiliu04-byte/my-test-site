@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>1000x1000 套圖選單</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;800&family=Noto+Sans+TC:wght@600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --panel-w: 360px;
+      --gap: 24px;
+      --border: #e6e6e6;
+      --text: #111;
+      --muted: #666;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", Arial, sans-serif;
+      background:#fafafa;
+      color:var(--text);
+    }
+    .wrap{
+      display:grid;
+      grid-template-columns: 1000px var(--panel-w);
+      gap: var(--gap);
+      padding:24px;
+      justify-content:center;
+      align-items:start;
+    }
+
+    .stage{
+      width:1000px;
+      height:1000px;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      position:relative;
+      overflow:hidden;
+      box-shadow: 0 10px 28px rgba(0,0,0,.07);
+    }
+
+    .slot{
+      position:absolute;
+      display:none;
+    }
+    .slot > img{
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:contain;
+      object-position:center;
+      pointer-events:none;
+      user-select:none;
+    }
+
+    /* 品牌列貼頂（避免素材透明 padding 造成視覺留白） */
+    #slot-brand > img{
+      object-fit: cover;
+      object-position: top center;
+    }
+
+    .icon-label{
+      position:absolute;
+      display:none;
+      font-family:"Inter","Noto Sans TC",system-ui,sans-serif;
+      font-weight:800;
+      font-size:14px;
+      color:#0f2f4f;
+      letter-spacing:.5px;
+      text-align:center;
+      pointer-events:none;
+      user-select:none;
+    }
+
+    .panel{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      box-shadow: 0 10px 28px rgba(0,0,0,.07);
+      position:sticky;
+      top:16px;
+    }
+    .group{
+      padding:12px 0;
+      border-bottom:1px solid #f1f1f1;
+    }
+    .group:last-child{ border-bottom:none; }
+
+    .title{
+      margin:0 0 8px;
+      font-size:14px;
+      font-weight:800;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin:8px 0;
+    }
+    select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-size:14px;
+      outline:none;
+    }
+    label{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      font-size:14px;
+    }
+    input[type="checkbox"]{
+      width:18px;
+      height:18px;
+    }
+
+    /* 容量多選 */
+    .cap-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:6px;
+    }
+    .cap-item{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:#fff;
+      cursor:pointer;
+      user-select:none;
+      font-size:14px;
+    }
+    .cap-item span{ font-weight:700; }
+
+    .btns{
+      display:flex;
+      gap:10px;
+      margin-top:14px;
+    }
+    button{
+      flex:1;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#111;
+      color:#fff;
+      cursor:pointer;
+      font-weight:800;
+    }
+    button.secondary{
+      background:#fff;
+      color:#111;
+    }
+
+    .hint{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    @media (max-width: 1440px){
+      .wrap{ grid-template-columns: 1fr; }
+      .stage{ margin:0 auto; }
+      .panel{ position:static; width:min(100%, 560px); margin:0 auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- 左側舞台 -->
+    <div class="stage" id="stage">
+      <!-- 品牌 -->
+      <div class="slot" id="slot-brand"><img id="img-brand" alt="品牌/官方識別"></div>
+
+      <!-- ✅ 產品分類圖（新增） -->
+      <div class="slot" id="slot-product"><img id="img-product" alt="產品圖"></div>
+
+      <!-- WH -->
+      <div class="slot" id="slot-wh"><img id="img-wh" alt="有標示Wh"></div>
+
+      <!-- 保固 / 瓦數 -->
+      <div class="slot" id="slot-warranty"><img id="img-warranty" alt="保固"></div>
+      <div class="slot" id="slot-watts"><img id="img-watts" alt="瓦數"></div>
+
+      <!-- ICON -->
+      <div class="slot" id="slot-icon1"><img id="img-icon1" alt="ICON 1"></div>
+      <div class="slot" id="slot-icon2"><img id="img-icon2" alt="ICON 2"></div>
+      <div class="slot" id="slot-icon3"><img id="img-icon3" alt="ICON 3"></div>
+      <div class="icon-label" id="lbl-icon1"></div>
+      <div class="icon-label" id="lbl-icon2"></div>
+      <div class="icon-label" id="lbl-icon3"></div>
+
+      <!-- 容量 -->
+      <div class="slot" id="slot-cap-32"><img id="img-cap-32" alt="32GB"></div>
+      <div class="slot" id="slot-cap-64"><img id="img-cap-64" alt="64GB"></div>
+      <div class="slot" id="slot-cap-128"><img id="img-cap-128" alt="128GB"></div>
+      <div class="slot" id="slot-cap-256"><img id="img-cap-256" alt="256GB"></div>
+    </div>
+
+    <!-- 右側控制 -->
+    <div class="panel">
+      <div class="group">
+        <p class="title">品牌 / 官方識別</p>
+        <select id="sel-brand">
+          <option value="">（不選）</option>
+          <option value="brand1">SP 廣穎官方旗艦店</option>
+          <option value="brand2">SP 廣穎電通</option>
+        </select>
+
+        <div class="row" style="margin-top:10px;">
+          <label><input type="checkbox" id="chk-wh" /> 有標示 Wh</label>
+        </div>
+
+        <div class="row">
+          <select id="sel-watts">
+            <option value="">瓦數：無</option>
+            <option value="20w">瓦數：20 watts</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ✅ 產品分類 -->
+      <div class="group">
+        <p class="title">產品分類</p>
+        <select id="sel-category">
+          <option value="">（不選）</option>
+          <option value="DRAM">DRAM</option>
+          <option value="SSD">SSD</option>
+          <option value="POWERBANK">POWERBANK</option>
+          <option value="PSD">PSD</option>
+          <option value="Flash card">Flash card</option>
+          <option value="PHD">PHD</option>
+          <option value="UFD">UFD</option>
+          <option value="card reader">card reader</option>
+          <option value="cables">cables</option>
+          <option value="wall cah">wall cah</option>
+        </select>
+
+        <!-- 子分類：預設隱藏 -->
+        <div class="row" id="subcat-row" style="display:none;">
+          <select id="sel-subcategory">
+            <option value="">子分類：（不選）</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="group">
+        <p class="title">保固</p>
+        <select id="sel-warranty">
+          <option value="">（不選）</option>
+          <option value="w13m">13個月保固</option>
+          <option value="w2y">2年保固</option>
+          <option value="w10y">10年保固</option>
+          <option value="w5y">5年保固</option>
+        </select>
+      </div>
+
+      <div class="group">
+        <p class="title">容量（除了PBK）</p>
+        <div class="cap-grid">
+          <label class="cap-item"><input type="checkbox" id="cap-32"  value="32"><span>32GB</span></label>
+          <label class="cap-item"><input type="checkbox" id="cap-64"  value="64"><span>64GB</span></label>
+          <label class="cap-item"><input type="checkbox" id="cap-128" value="128"><span>128GB</span></label>
+          <label class="cap-item"><input type="checkbox" id="cap-256" value="256"><span>256GB</span></label>
+        </div>
+      </div>
+
+      <div class="group">
+        <p class="title">ICON（3 個下拉）</p>
+        <div class="row"><select id="sel-icon1">
+          <option value="">ICON 1：無</option>
+          <option value="3dnand">3D NAND</option>
+          <option value="4khdmi">4K HDMI</option>
+          <option value="4kuhd">4K UHD</option>
+        </select></div>
+
+        <div class="row"><select id="sel-icon2">
+          <option value="">ICON 2：無</option>
+          <option value="3dnand">3D NAND</option>
+          <option value="4khdmi">4K HDMI</option>
+          <option value="4kuhd">4K UHD</option>
+        </select></div>
+
+        <div class="row"><select id="sel-icon3">
+          <option value="">ICON 3：無</option>
+          <option value="3dnand">3D NAND</option>
+          <option value="4khdmi">4K HDMI</option>
+          <option value="4kuhd">4K UHD</option>
+        </select></div>
+      </div>
+
+      <div class="btns">
+        <button class="secondary" id="btn-reset" type="button">清空</button>
+      </div>
+
+      <div class="hint">
+        容量排序固定：32 → 64 → 128 → 256（小到大、左到右）。<br>
+        產品分類：選分類後才會出現子分類，下拉選子分類才會顯示產品圖。
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toFileUrl(p){
+      if(!p) return "";
+      if(/^https?:\/\//i.test(p) || /^file:\/\//i.test(p)) return p;
+      if(/^[A-Za-z]:\\/.test(p)){
+        return "file:///" + p.replaceAll("\\", "/");
+      }
+      return p;
+    }
+
+    const cfg = {
+      brand: {
+        brand1: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Brand shop\brand shop_1.png`),
+        brand2: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Brand shop\brand shop_2.png`),
+      },
+      wh: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\WH\wh.png`),
+      watts: {
+        "20w": toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Watts\20watts.png`)
+      },
+      warranty: {
+        w13m: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Warranty\13mWarranty.png`),
+        w2y:  toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Warranty\2yWarranty.png`),
+        w10y: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Warranty\10yWarranty.png`),
+        w5y:  toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Warranty\5yWarranty.png`),
+      },
+      icon: {
+        "3dnand": toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\ICON\3D NAND.png`),
+        "4khdmi": toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\ICON\4K HDMI.png`),
+        "4kuhd":  toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\ICON\4K UHD.png`),
+      },
+      cap: {
+        "32":  toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Capacity\1x\32GB.png`),
+        "64":  toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Capacity\1x\64GB.png`),
+        "128": toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Capacity\1x\128GB.png`),
+        "256": toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Capacity\1x\256GB.png`),
+      },
+
+      // ✅ 產品分類-子分類圖片（你提供的先放；DRAM 待補留空）
+      product: {
+        POWERBANK: {
+          QS58: toFileUrl(String.raw`C:\Users\chi_liu\Desktop\project\img\Product\QS58.png`)
+        },
+        DRAM: {
+          "xpower ddr5 rgb": "", // 待補
+          "xpower ddr4 rgb": ""  // 待補
+        }
+      }
+    };
+
+    // 分類 -> 子分類清單
+    const categoryMap = {
+      DRAM: ["xpower ddr5 rgb", "xpower ddr4 rgb"],
+      POWERBANK: ["QS58"],
+      SSD: [],
+      PSD: [],
+      "Flash card": [],
+      PHD: [],
+      UFD: [],
+      "card reader": [],
+      cables: [],
+      "wall cah": [],
+    };
+
+    const iconLabelMap = { "3dnand":"3D NAND", "4khdmi":"4K HDMI", "4kuhd":"4K UHD" };
+
+    const layout = {
+      stageW: 1000,
+      stageH: 1000,
+
+      brand: { h: 140 },
+
+      // ✅ 產品圖：距品牌底 27px、距左 27px
+      product: { left: 27, topGapFromBrand: 27, w: 520, h: 520 },
+
+      gapAfterBrand: 30,
+      gapAfterWh: 20,
+
+      rightPad: 27,
+      gapWarrantyWatts: 8,
+
+      wh: { w: 500, h: 70 },
+      warranty: { w: 260, h: 220 },
+      watts:    { w: 240, h: 220 },
+
+      icon: {
+        left: 850,
+        w: 120,
+        h: 90,
+        topGapFromRow: 50,
+        gapY: 40,
+        labelGap: 8
+      },
+
+      // ✅ 容量（選幾個顯示幾個），但「排列順序固定」由左到右 32/64/128/256
+      cap: {
+        w: 110, h: 110,
+        gap: 6,
+        right: 65,
+        bottom: 140,
+        gapToIcon: 20
+      }
+    };
+
+    const els = {
+      stage: document.getElementById("stage"),
+
+      selBrand: document.getElementById("sel-brand"),
+      chkWh: document.getElementById("chk-wh"),
+      selWatts: document.getElementById("sel-watts"),
+      selWarranty: document.getElementById("sel-warranty"),
+
+      selCategory: document.getElementById("sel-category"),
+      subcatRow: document.getElementById("subcat-row"),
+      selSubcategory: document.getElementById("sel-subcategory"),
+
+      selIcon1: document.getElementById("sel-icon1"),
+      selIcon2: document.getElementById("sel-icon2"),
+      selIcon3: document.getElementById("sel-icon3"),
+
+      cap32: document.getElementById("cap-32"),
+      cap64: document.getElementById("cap-64"),
+      cap128: document.getElementById("cap-128"),
+      cap256: document.getElementById("cap-256"),
+
+      slotBrand: document.getElementById("slot-brand"),
+      imgBrand: document.getElementById("img-brand"),
+
+      slotProduct: document.getElementById("slot-product"),
+      imgProduct: document.getElementById("img-product"),
+
+      slotWh: document.getElementById("slot-wh"),
+      imgWh: document.getElementById("img-wh"),
+
+      slotWarranty: document.getElementById("slot-warranty"),
+      imgWarranty: document.getElementById("img-warranty"),
+      slotWatts: document.getElementById("slot-watts"),
+      imgWatts: document.getElementById("img-watts"),
+
+      slotIcon1: document.getElementById("slot-icon1"),
+      imgIcon1: document.getElementById("img-icon1"),
+      lblIcon1: document.getElementById("lbl-icon1"),
+
+      slotIcon2: document.getElementById("slot-icon2"),
+      imgIcon2: document.getElementById("img-icon2"),
+      lblIcon2: document.getElementById("lbl-icon2"),
+
+      slotIcon3: document.getElementById("slot-icon3"),
+      imgIcon3: document.getElementById("img-icon3"),
+      lblIcon3: document.getElementById("lbl-icon3"),
+
+      slotCap32: document.getElementById("slot-cap-32"),
+      imgCap32: document.getElementById("img-cap-32"),
+      slotCap64: document.getElementById("slot-cap-64"),
+      imgCap64: document.getElementById("img-cap-64"),
+      slotCap128: document.getElementById("slot-cap-128"),
+      imgCap128: document.getElementById("img-cap-128"),
+      slotCap256: document.getElementById("slot-cap-256"),
+      imgCap256: document.getElementById("img-cap-256"),
+
+      btnReset: document.getElementById("btn-reset"),
+    };
+
+    function applyRect(el, r){
+      el.style.left = r.left + "px";
+      el.style.top = r.top + "px";
+      el.style.width = r.width + "px";
+      el.style.height = r.height + "px";
+    }
+
+    function setSlot(slotEl, imgEl, src){
+      if(!src){
+        imgEl.removeAttribute("src");
+        slotEl.style.display = "none";
+        return;
+      }
+      imgEl.src = src;
+      slotEl.style.display = "block";
+    }
+
+    function setIcon(slotEl, imgEl, labelEl, key){
+      if(!key){
+        setSlot(slotEl, imgEl, "");
+        labelEl.style.display = "none";
+        labelEl.textContent = "";
+        return;
+      }
+      setSlot(slotEl, imgEl, cfg.icon[key]);
+      labelEl.textContent = iconLabelMap[key] || "";
+      labelEl.style.display = "block";
+    }
+
+    // ✅ 容量順序固定：小到大（左到右）
+    function getSelectedCapsInOrder(){
+      const order = ["32","64","128","256"];
+      const state = {
+        "32": els.cap32.checked,
+        "64": els.cap64.checked,
+        "128": els.cap128.checked,
+        "256": els.cap256.checked
+      };
+      return order.filter(k => state[k]);
+    }
+
+    // 分類改變時，更新子分類下拉
+    function updateSubcategoryUI(){
+      const cat = els.selCategory.value;
+      const subs = categoryMap[cat] || [];
+
+      if(!cat || subs.length === 0){
+        els.subcatRow.style.display = "none";
+        els.selSubcategory.innerHTML = `<option value="">子分類：（不選）</option>`;
+        els.selSubcategory.value = "";
+        return;
+      }
+
+      els.subcatRow.style.display = "flex";
+      els.selSubcategory.innerHTML = `<option value="">子分類：（不選）</option>` +
+        subs.map(s => `<option value="${s}">${s}</option>`).join("");
+
+      els.selSubcategory.value = "";
+    }
+
+    function layoutSlots(visible){
+      const W = layout.stageW;
+      const H = layout.stageH;
+
+      // 品牌貼頂
+      applyRect(els.slotBrand, { left: 0, top: 0, width: W, height: layout.brand.h });
+
+      // ✅ 產品圖位置：距品牌底 27px、距左 27px
+      const productTop = layout.brand.h + layout.product.topGapFromBrand;
+      applyRect(els.slotProduct, {
+        left: layout.product.left,
+        top: productTop,
+        width: layout.product.w,
+        height: layout.product.h
+      });
+
+      let cursorY = layout.brand.h + layout.gapAfterBrand;
+
+      // WH
+      if(visible.wh){
+        const whLeft = W - layout.rightPad - layout.wh.w;
+        applyRect(els.slotWh, { left: whLeft, top: cursorY, width: layout.wh.w, height: layout.wh.h });
+        cursorY += layout.wh.h + layout.gapAfterWh;
+      }
+
+      // 保固+瓦數
+      const showRow = visible.warranty || visible.watts;
+      if(showRow){
+        const wattsLeft = W - layout.rightPad - layout.watts.w;
+        applyRect(els.slotWatts, { left: wattsLeft, top: cursorY, width: layout.watts.w, height: layout.watts.h });
+
+        const warrantyLeft = wattsLeft - layout.gapWarrantyWatts - layout.warranty.w;
+        applyRect(els.slotWarranty, { left: warrantyLeft, top: cursorY, width: layout.warranty.w, height: layout.warranty.h });
+
+        cursorY += layout.warranty.h;
+      }
+
+      // ICON
+      const iconTopBase = cursorY + layout.icon.topGapFromRow;
+      const iconRects = [
+        { left: layout.icon.left, top: iconTopBase + (layout.icon.h + layout.icon.gapY) * 0, width: layout.icon.w, height: layout.icon.h },
+        { left: layout.icon.left, top: iconTopBase + (layout.icon.h + layout.icon.gapY) * 1, width: layout.icon.w, height: layout.icon.h },
+        { left: layout.icon.left, top: iconTopBase + (layout.icon.h + layout.icon.gapY) * 2, width: layout.icon.w, height: layout.icon.h },
+      ];
+      applyRect(els.slotIcon1, iconRects[0]);
+      applyRect(els.slotIcon2, iconRects[1]);
+      applyRect(els.slotIcon3, iconRects[2]);
+
+      const labels = [els.lblIcon1, els.lblIcon2, els.lblIcon3];
+      iconRects.forEach((r, i) => {
+        labels[i].style.left = r.left + "px";
+        labels[i].style.top = (r.top + r.height + layout.icon.labelGap) + "px";
+        labels[i].style.width = r.width + "px";
+      });
+
+      // ✅ 容量：依選取數量顯示，從左到右 32/64/128/256
+      const cap = layout.cap;
+      const selected = getSelectedCapsInOrder();
+
+      const capTop = H - cap.bottom - cap.h;
+
+      // 右邊界要避開 icon
+      const capRightEdgeByStage = W - cap.right;
+      const capRightEdgeByIcon  = layout.icon.left - cap.gapToIcon;
+      const capRightEdge = Math.min(capRightEdgeByStage, capRightEdgeByIcon);
+
+      const totalW = selected.length * cap.w + Math.max(0, selected.length - 1) * cap.gap;
+      const leftStart = capRightEdge - totalW; // 右對齊後，往左排
+
+      // 計算每個被選容量的位置（左到右）
+      const pos = {};
+      selected.forEach((k, idx) => {
+        pos[k] = {
+          left: leftStart + idx * (cap.w + cap.gap),
+          top: capTop,
+          width: cap.w,
+          height: cap.h
+        };
+      });
+
+      // 未選就丟到畫面外（反正 display:none）
+      const off = { left: -9999, top: -9999, width: cap.w, height: cap.h };
+
+      applyRect(els.slotCap32,  pos["32"]  || off);
+      applyRect(els.slotCap64,  pos["64"]  || off);
+      applyRect(els.slotCap128, pos["128"] || off);
+      applyRect(els.slotCap256, pos["256"] || off);
+    }
+
+    function refresh(){
+      const visible = {
+        wh: els.chkWh.checked,
+        watts: !!els.selWatts.value,
+        warranty: !!els.selWarranty.value,
+      };
+
+      layoutSlots(visible);
+
+      // 品牌
+      const b = els.selBrand.value;
+      setSlot(els.slotBrand, els.imgBrand, cfg.brand[b] || "");
+
+      // ✅ 產品圖（分類 + 子分類）
+      const cat = els.selCategory.value;
+      const sub = els.selSubcategory.value;
+      const prodSrc = (cat && sub) ? (cfg.product?.[cat]?.[sub] || "") : "";
+      setSlot(els.slotProduct, els.imgProduct, prodSrc);
+
+      // WH
+      setSlot(els.slotWh, els.imgWh, visible.wh ? cfg.wh : "");
+
+      // 瓦數
+      const w = els.selWatts.value;
+      setSlot(els.slotWatts, els.imgWatts, cfg.watts[w] || "");
+
+      // 保固
+      const wa = els.selWarranty.value;
+      setSlot(els.slotWarranty, els.imgWarranty, cfg.warranty[wa] || "");
+
+      // ICON
+      setIcon(els.slotIcon1, els.imgIcon1, els.lblIcon1, els.selIcon1.value);
+      setIcon(els.slotIcon2, els.imgIcon2, els.lblIcon2, els.selIcon2.value);
+      setIcon(els.slotIcon3, els.imgIcon3, els.lblIcon3, els.selIcon3.value);
+
+      // 容量：依選取顯示
+      const selected = getSelectedCapsInOrder();
+
+      // 全部關掉
+      setSlot(els.slotCap32,  els.imgCap32,  "");
+      setSlot(els.slotCap64,  els.imgCap64,  "");
+      setSlot(els.slotCap128, els.imgCap128, "");
+      setSlot(els.slotCap256, els.imgCap256, "");
+
+      // 打開選到的
+      selected.forEach(k => {
+        if(k === "32")  setSlot(els.slotCap32,  els.imgCap32,  cfg.cap["32"]);
+        if(k === "64")  setSlot(els.slotCap64,  els.imgCap64,  cfg.cap["64"]);
+        if(k === "128") setSlot(els.slotCap128, els.imgCap128, cfg.cap["128"]);
+        if(k === "256") setSlot(els.slotCap256, els.imgCap256, cfg.cap["256"]);
+      });
+    }
+
+    // 事件
+    [
+      els.selBrand, els.chkWh, els.selWatts, els.selWarranty,
+      els.selIcon1, els.selIcon2, els.selIcon3,
+      els.cap32, els.cap64, els.cap128, els.cap256,
+      els.selCategory, els.selSubcategory
+    ].forEach(el => el.addEventListener("change", () => {
+      if(el === els.selCategory){
+        updateSubcategoryUI();
+      }
+      refresh();
+    }));
+
+    els.btnReset.addEventListener("click", () => {
+      els.selBrand.value = "";
+      els.chkWh.checked = false;
+      els.selWatts.value = "";
+      els.selWarranty.value = "";
+
+      els.selCategory.value = "";
+      updateSubcategoryUI();
+      els.selSubcategory.value = "";
+
+      els.selIcon1.value = "";
+      els.selIcon2.value = "";
+      els.selIcon3.value = "";
+
+      els.cap32.checked = false;
+      els.cap64.checked = false;
+      els.cap128.checked = false;
+      els.cap256.checked = false;
+
+      refresh();
+    });
+
+    // init
+    updateSubcategoryUI();
+    refresh();
+  </script>
+</body>
+</html>
